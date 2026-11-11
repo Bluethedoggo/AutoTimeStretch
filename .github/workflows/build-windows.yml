@@ -1,0 +1,34 @@
+name: Build DogSide Audio Plugins (Windows VST3)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -A x64
+
+      - name: Build
+        run: cmake --build build --config Release --target AutoWarp_VST3 AutoWarp_Standalone AutoTimeStretch_VST3 AutoTimeStretch_Standalone --parallel
+
+      - name: Collect files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item -Recurse build/AutoWarp_artefacts/Release/VST3/AutoWarp.vst3 dist/AutoWarp.vst3
+          Copy-Item build/AutoWarp_artefacts/Release/Standalone/AutoWarp.exe dist/AutoWarp-Standalone.exe
+          Copy-Item -Recurse build/AutoTimeStretch_artefacts/Release/VST3/AutoTimeStretch.vst3 dist/AutoTimeStretch.vst3
+          Copy-Item build/AutoTimeStretch_artefacts/Release/Standalone/AutoTimeStretch.exe dist/AutoTimeStretch-Standalone.exe
+          Copy-Item README.md dist/README.md
+          Get-ChildItem -Recurse dist | Select-Object FullName, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DogSide-Audio-Plugins-Windows
+          path: dist
