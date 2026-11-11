@@ -179,11 +179,12 @@ bool AutoTimeStretchAudioProcessor::exportWav (const juce::File& file) const
 
     file.deleteFile();
 
-    std::unique_ptr<juce::OutputStream> stream =
-        std::make_unique<juce::FileOutputStream> (file);
-
-    if (!stream || !stream->openedOk())
+    auto fileStream = std::make_unique<juce::FileOutputStream> (file);
+    
+    if (!fileStream->openedOk())
         return false;
+    
+    std::unique_ptr<juce::OutputStream> stream = std::move (fileStream);
 
     juce::WavAudioFormat wav;
 
