@@ -3,6 +3,7 @@
 #include "AutoTimeStretchEditor.h"
 #include <cmath>
 #include <algorithm>
+#include <limits>
 
 namespace
 {
